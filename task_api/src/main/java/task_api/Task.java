@@ -28,4 +28,10 @@ public class Task {
 
     }
 
+    public Long getId() { return this.id; }
+
+    public TaskStatus getStatus() { return this.status; }
+
+    public String getTitle() { return this.title; }
+
 }
