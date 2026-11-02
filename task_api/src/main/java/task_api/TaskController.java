@@ -1,6 +1,7 @@
 package task_api;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import java.util.Map;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 
 @RestController
 public class TaskController {
@@ -24,7 +26,7 @@ public class TaskController {
     }
 
     @PostMapping("/tasks")
-    public Task createTask(@RequestBody CreateTaskRequest request) {
+    public Task createTask(@Valid @RequestBody CreateTaskRequest request) {
         return taskService.addTask(request.getTitle(), request.getDescription());
     }
 
@@ -44,6 +46,15 @@ public class TaskController {
         }
 
         if (taskService.updateTask(id, request.getStatus())) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/tasks/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable("id") Long id) {
+        if (taskService.deleteTask(id)) {
             return ResponseEntity.noContent().build();
         }
 

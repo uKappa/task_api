@@ -9,12 +9,15 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 @WebMvcTest(TaskController.class)
 public class TaskControllerTest {
@@ -46,6 +49,21 @@ public class TaskControllerTest {
             .andExpect(jsonPath("$.title").value("Learn Spring Boot"))
             .andExpect(jsonPath("$.description").value("Build my first REST API"))
             .andExpect(jsonPath("$.status").value("TODO"));
+    }
+
+    @Test
+    void shouldRejectTaskWithBlankTitle() throws Exception {
+        mockMvc.perform(post("/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "title": "   ",
+                        "description": "Build my first REST API"
+                    }
+                    """))
+            .andExpect(status().isBadRequest());
+
+        verify(taskService, never()).addTask("   ", "Build my first REST API");
     }
 
     @Test
@@ -100,4 +118,15 @@ public class TaskControllerTest {
                 .content("{}"))
             .andExpect(status().isBadRequest());
     }
+
+    @Test 
+    void shouldDeleteTaskWhenTaskExists() throws Exception {
+        when(taskService.deleteTask(1L)).thenReturn(true);
+
+        mockMvc.perform(delete("/tasks/{id}", 1L))
+            .andExpect(status().isNoContent());
+    }
+
+    
+
 }
