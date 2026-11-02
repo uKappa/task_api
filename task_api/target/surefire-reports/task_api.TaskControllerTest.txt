@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: task_api.TaskControllerTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.237 s -- in task_api.TaskControllerTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.709 s -- in task_api.TaskControllerTest
