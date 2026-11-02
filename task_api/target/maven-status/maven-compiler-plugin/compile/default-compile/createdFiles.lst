@@ -1,0 +1,5 @@
+task_api\TaskController.class
+task_api\TaskStatus.class
+task_api\Main.class
+task_api\TaskService.class
+task_api\Task.class

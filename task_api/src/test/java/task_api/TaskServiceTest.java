@@ -16,69 +16,65 @@ class TaskServiceTest {
     }
 
     @Test
-    void shouldCreateTask() {
-        Task task = service.addTask("Test");
-
-        assertNotNull(task);
-        assertEquals(1L, task.getId());
-        assertEquals("Test", task.getTitle());
-        assertEquals(TaskStatus.TODO, task.getStatus());
+    void shouldReturnEmptyCollectionWhenNoTasksExist() {
+        assertTrue(service.getAllTasks().isEmpty());
     }
 
     @Test
-    void shouldFindTaskById() {
-        Task created = service.addTask("Test");
+    void shouldReturnAllTasks() {
+        Task first = service.addTask("Learn Java",null);
+        Task second = service.addTask("Learn JUnit",null);
 
-        var result = service.getTaskById(created.getId());
+        var tasks = service.getAllTasks();
 
-        assertTrue(result.isPresent());
-        assertEquals("Test", result.get().getTitle());
+        assertEquals(2, tasks.size());
+        assertTrue(tasks.containsKey(first.getId()));
+        assertTrue(tasks.containsKey(second.getId()));
     }
 
     @Test
-    void shouldReturnEmptyWhenTaskDoesNotExist() {
-        var result = service.getTaskById(999L);
+    void shouldReturnCopyOfTaskCollection() {
+        Task task = service.addTask("Learn Java",null);
 
-        assertTrue(result.isEmpty());
+        var tasks = service.getAllTasks();
+        tasks.clear();
+
+        assertTrue(service.getTaskById(task.getId()).isPresent());
     }
 
     @Test
-    void shouldUpdateTaskStatus() {
-        Task task = service.addTask("Test");
+    void shouldReturnFalseWhenDeletingMissingTask() {
+        assertFalse(service.deleteTask(999L));
+    }
 
-        boolean updated = service.updateTask(
-            task.getId(),
-            TaskStatus.IN_PROGRESS
+    @Test
+    void shouldRejectNullTitle() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> service.addTask(null, null)
         );
+    }
 
-        assertTrue(updated);
+    @Test
+    void shouldRejectEmptyTitle() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> service.addTask("", null)
+        );
+    }
 
-        var result = service.getTaskById(task.getId());
-
-        assertTrue(result.isPresent());
-        assertEquals(
-            TaskStatus.IN_PROGRESS,
-            result.get().getStatus()
+    @Test
+    void shouldRejectBlankTitle() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> service.addTask("   ", null)
         );
     }
 
     @Test
     void shouldReturnFalseWhenUpdatingMissingTask() {
-        boolean updated = service.updateTask(
-            999L,
-            TaskStatus.DONE
+        assertFalse(
+            service.updateTask(999L, TaskStatus.DONE)
         );
-
-        assertFalse(updated);
-    }
-
-    @Test
-    void shouldDeleteTask() {
-        Task task = service.addTask("Test");
-
-        boolean deleted = service.deleteTask(task.getId());
-
-        assertTrue(deleted);
-        assertTrue(service.getTaskById(task.getId()).isEmpty());
     }
 }

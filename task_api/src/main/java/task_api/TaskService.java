@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class TaskService {
 
     private Long id;
@@ -16,9 +19,9 @@ public class TaskService {
         
     }
 
-    Task addTask(String title){
+    Task addTask(String title, String description){
 
-        Task newTask = new Task(id, title, null);
+        Task newTask = new Task(id, title, description);
         
         taskCollection.put(id, newTask);
         id += 1;
