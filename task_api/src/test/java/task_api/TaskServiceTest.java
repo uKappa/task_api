@@ -77,4 +77,14 @@ class TaskServiceTest {
             service.updateTask(999L, TaskStatus.DONE)
         );
     }
+
+    @Test 
+    void shouldUpdateTaskStatusWhenTaskExists() {
+        Task task = service.addTask("Test", null);
+        assertTrue(
+            service.updateTask(task.getId(), TaskStatus.DONE)
+        );
+        assertEquals(TaskStatus.DONE, service.getTaskById(task.getId()).get().getStatus());
+    }
+
 }

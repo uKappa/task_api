@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
@@ -44,7 +45,8 @@ public class TaskControllerTest {
         mockMvc.perform(post("/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
+            .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/tasks/1")))
             .andExpect(jsonPath("$.id").value(1))
             .andExpect(jsonPath("$.title").value("Learn Spring Boot"))
             .andExpect(jsonPath("$.description").value("Build my first REST API"))
@@ -127,6 +129,12 @@ public class TaskControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    
+    @Test
+    void shouldReturnNotFoundWhenDeletingMissingTask() throws Exception {
+        when(taskService.deleteTask(999L)).thenReturn(false);
+
+        mockMvc.perform(delete("/tasks/{id}", 999L))
+            .andExpect(status().isNotFound());
+    }
 
 }

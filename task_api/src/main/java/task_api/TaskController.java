@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import jakarta.validation.Valid;
 
 @RestController
@@ -26,8 +27,14 @@ public class TaskController {
     }
 
     @PostMapping("/tasks")
-    public Task createTask(@Valid @RequestBody CreateTaskRequest request) {
-        return taskService.addTask(request.getTitle(), request.getDescription());
+    public ResponseEntity<Task> createTask(@Valid @RequestBody CreateTaskRequest request) {
+        Task createdTask = taskService.addTask(request.getTitle(), request.getDescription());
+        var location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdTask.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(createdTask);
     }
 
     @GetMapping("/tasks/{id}")
